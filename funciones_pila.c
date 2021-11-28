@@ -99,66 +99,22 @@ void imprimir_pila(Pila *pila){
     printf("%s\n", pila->fin->data);
 }
 
-//Función que comprueba si una linea de texto está bien parentesida o no. Si está bien regresa 1. Si NO está bien parentizada regresa 0.
-int comprobar_parentesis(char *texto){
-    Pila * stack_parentesis = nuevaPila();
-    Pila * stack_leido = nuevaPila();
-    Pila * stack_data = nuevaPila();
-
-    int i, aux, contador_inicio, contador_final;
-    int tam_texto = strlen(texto);
-
-    for(i=0; i<tam_texto; i++){
-        switch(texto[i]){
-            case '<':
-                aux=push(stack_parentesis, "<");
-                contador_inicio=i+1;
-                break;
-            case '>':
-                if ((es_vacia(stack_parentesis)) || (strcmp(tope(stack_parentesis), "<")!=0)){
-                    return 0;
-                }
-                aux=pop(stack_parentesis);
-                contador_final=i;
-                aux=nueva_etiqueta(stack_leido, texto, contador_inicio, contador_final);
-                if(aux==0)
-                    return 0;
-                break;
-            case '/':
-                if(texto[i-1] != '<'){
-                    return 0;
-                }
-        }
-    }
-    if (!es_vacia(stack_parentesis) || !es_vacia(stack_leido)){
-        return 0;
-    }
-    return 1;
-}
-
-int nueva_etiqueta(Pila * stack_etiquetas, char texto[],int inicio, int fin){
-    char *etiqueta;
-    
-    etiqueta = malloc(sizeof(char) * (1+fin-inicio));
-
-    strncpy(etiqueta, texto + (inicio*sizeof(char)), fin-inicio);
-    etiqueta[fin-inicio]='\0';
-    strlwr(etiqueta);
-    if(etiqueta[0]=='/'){
-        strncpy(etiqueta, etiqueta + (1*sizeof(char)), strlen(etiqueta)-1);
-        etiqueta[strlen(etiqueta)-1]='\0';
-        if (es_vacia(stack_etiquetas) || strcmp(tope(stack_etiquetas), etiqueta) !=0){
-            return 0;
-        }   
-        pop(stack_etiquetas);
-        return 1;    
-    }
-    push(stack_etiquetas, etiqueta);
-    return 1;
-}
-
 char * tope(Pila *pila){
     return pila->fin->data;
+}
+
+int buscar(Pila *pila, char texto[]){
+    int i=1;
+    Nodo *n;
+    n=pila->inicio;
+
+    while(i!= pila->tos+1){
+        if(strcmp(texto, n->data) == 0)
+            return i;
+        n=n->siguiente;
+        i++;
+    }
+    return -1;
 }
 
 /*
@@ -169,4 +125,31 @@ void liberarPila(Pila *pila){
     free(pila->v);
     free(pila);
 }
+
+
+void llenar_datos(char texto[]){
+    int i, contador_inicio, contador_final;
+    char etiqueta[40];
+
+    contador_inicio=-1;
+    for (i=0; i<strlen(texto)-1; i++){
+        switch(texto[i]){
+            case '>':
+                if(texto[i+1] != '<'){
+                    contador_inicio = i+1; 
+                }
+                break;
+            case '<':
+                if(contador_inicio != -1){
+                    contador_final= i-1;
+                    strncpy(etiqueta, texto + (contador_inicio*sizeof(char)), 1+contador_final-contador_inicio);
+                    etiqueta[1+contador_final- contador_inicio]='\0';
+                    printf("%s\n", etiqueta);
+                    contador_inicio=-1;
+                }
+                break;
+        }
+    }
+}
+
 */
